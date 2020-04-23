@@ -18,29 +18,43 @@ try:
     cursor = conn.cursor()
     cursor.execute("""SELECT * from sales""")
 
-    result  = {}
 
-    df = pd.DataFrame(columns= ["cust", "prod", "sum(quant)"])
+    df = pd.DataFrame(columns= ["cust", "prod", "sum(quant)", "avg(quant)"])
     
     rows = cursor.fetchall()
 
+    # for row in rows:
+    #     if(((df['cust'] == row[0]) & (df['prod'] == row[1])).any()):
+    #         df[ (df.cust == row[0]) & (df.prod == row[1]) ]['sum(quant)'] += row[6]
+    #     else:
+    #         df = df.append({'cust' : row[0] , 'prod' : row[1], 'sum(quant)' : row[6] } , ignore_index=True)
+        # df["cust"] = row[0]
+        # df["prod"] = row[1]
+        # df["sum(quant)"] = row[6]
+
+    # print(df)
+
+    result  = {}
+
     for row in rows:
-        if df.loc[df['cust'] == row[0]] and df.loc[df['prod'] == row[1]]:
-            df[ (df.cust == row[0]) & (df.prod == row[1]) ] ['sum(quant)'] += row[6]
+        if (row[0], row[1]) in result.keys():
+            result[(row[0], row[1])]['sum(quant)'] += row[6]
+            result[(row[0], row[1])]['freq'] += 1
+            result[(row[0], row[1])]['avg(quant)'] = (result[(row[0], row[1])]['sum(quant)']) / (result[(row[0], row[1])]['freq'])
         else:
-            df = df.append({'cust' : row[0] , 'prod' : row[1], 'sum(quant)' : row[6] } , ignore_index=True)
+            result[(row[0], row[1])] = {}
+            result[(row[0], row[1])]['sum(quant)'] = row[6]
+            result[(row[0], row[1])]['freq'] = 1
+            result[(row[0], row[1])]['avg(quant)'] = row[6]
+
+
+    
+    for key, value in result.items():
+        df = df.append({'cust' : key[0] , 'prod' : key[1], 'sum(quant)' : value['sum(quant)'], 'avg(quant)' : value['avg(quant)'] } , ignore_index=True)
 
     print(df)
+    # print(result)
 
-    # for row in rows:
-    #     if (row[0], row[1]) in result.keys():
-    #         result[(row[0], row[1])] += row[6]
-    #         result[(row[0], row[1])] 
-    #     else:
-    #         result[(row[0], row[1])] = row[6]
-    
-    # for key, value in result.items():
-    #     print(key , value)
 
     cursor.close()
     conn.close()
