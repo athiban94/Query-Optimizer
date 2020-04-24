@@ -1,6 +1,31 @@
 
 import psycopg2
 import json
+import pandas as pd
+
+def performSum(result, rows, groupbyTup, attrIndex, aggr):
+
+    freqStr = 'freq_' + aggr.split('_')[-1]
+    for row in rows:
+        groupAttriList = []
+        for index in groupbyTup:
+            groupAttriList.append(row[index])
+        
+        key = tuple(groupAttriList)
+        if key in result.keys():
+            result[key][aggr] += row[attrIndex]
+            result[key][freqStr] += 1
+        else:
+            result[key] = {
+                aggr    : row[attrIndex],
+                freqStr : 1
+            }
+
+def performAvg(result, aggr):
+    sumStr = "sum_"+aggr.split('_')[-1]
+    freqStr = "freq_"+aggr.split('_')[-1]
+    for key, value in result.items():
+        value[aggr]= value[sumStr]/value[freqStr]
 
 try:
     connect_str = "dbname='postgres' user='postgres' host='localhost' "
@@ -25,49 +50,79 @@ try:
         "quant" : 6
     }
 
+    aggFunctionDict = {}
+
+    for function in data['f']:
+        aggFunctionDict[function] = False
+    
+    print(aggFunctionDict)
 
     tup = []
     for attrib in data['v']:
         if attrib in dataBaseStruct.keys():
             tup.append(dataBaseStruct[attrib])
-            # tup.append("row"+str([dataBaseStruct[attrib]]))
-    print(tuple(tup))
 
-    for i in range(0, data['n']):
-        for aggr in data['f']:
-            if "sum" in aggr:
-                # data[key][aggr] += row[6]
-                pass
-            if "max" in aggr:
-                pass
-            if "avg" in aggr:
-                pass
-    
-    for row in rows:
-        for ele in tup:
-            print(row[ele])
-                
+    mainResult = {}
+    for aggr in data['f']:
+        if  "sum" in aggr:
+            sum_on_attr = aggr.split('_')[-1]
+            performSum(mainResult, rows, tuple(tup), dataBaseStruct[sum_on_attr], aggr)
+            aggFunctionDict[aggr] = True
+        
+        if "avg" in aggr:
+            avg_on_attr = aggr.split('_')[-1]
+            if "sum_"+avg_on_attr in aggFunctionDict.keys():
+                performAvg(mainResult, aggr)
+            else:
+                performSum(mainResult, rows, tuple(tup), dataBaseStruct[sum_on_attr], aggr)
+                performAvg(mainResult, aggr)
+
+    for key, value in mainResult.items():
+        for conditions in data['g']:
+            print(type(conditions))
+        
+
+
     cursor.close()
     conn.close()
 
-
-        # for row in rows:
-        #     if (row[0,1]) in data['f'][0].keys():
-        #         data['f'][0][(row[0], row[1])]['sum(quant)'] += row[6]
-        #         data['f'][0][(row[0], row[1])]['freq'] += 1
-        #         result[(row[0], row[1])]['avg(quant)'] = (result[(row[0], row[1])]['sum(quant)']) / (result[(row[0], row[1])]['freq'])
-        #     else:
-        #         result[(row[0], row[1])] = {}
-        #         result[(row[0], row[1])]['sum(quant)'] = row[6]
-        #         result[(row[0], row[1])]['freq'] = 1
-        #         result[(row[0], row[1])]['avg(quant)'] = row[6]
-
-
-
-    
 
 except Exception as e:
     print("Uh oh, can't connect. Invalid dbname, user or password?")
     print(e)
 
+
+"""
+        result = {
+            cust_prod : {
+                
+                (Emily, milk) : {
+                1_sum_quant: 2000
+                2_sum_quant: 2000
+                avg_quant: 4000
+                max_quant: 300
+                min_quant: 150
+                count_* : 30
+            }
+            },
+            (cust, prod) : {
+                sum_quant: 2000
+                avg_quant: 4000
+                max_quant: 300
+                min_quant: 150
+                count_* : 30
+            }
+        }
+    """
+
+"""
+    sum_quant = {
+        (bloom, bread) :  20000,
+        (Emily, milk) : 5677
+    }
+
+    avg_quant = {
+        (bloom, bread) : 3456
+    }
+"""
 
