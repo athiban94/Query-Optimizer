@@ -46,15 +46,12 @@ try:
             result[(row[0], row[1])]['sum(quant)'] = row[6]
             result[(row[0], row[1])]['freq'] = 1
             result[(row[0], row[1])]['avg(quant)'] = row[6]
-
-
     
     for key, value in result.items():
         df = df.append({'cust' : key[0] , 'prod' : key[1], 'sum(quant)' : value['sum(quant)'], 'avg(quant)' : value['avg(quant)'] } , ignore_index=True)
 
     print(df)
     # print(result)
-
 
     cursor.close()
     conn.close()

@@ -1,22 +1,22 @@
 {
     "select": [
-        "cust",
+        "cust", "prod",
         "1_sum_quant",
         "2_sum_quant",
         "3_sum_quant"
     ],
     "n": 3,
     "v": [
-        "cust"
+        "cust", "prod"
     ],
     "f": [
-        "1_sum_quant", "2_sum_quant", "3_sum_quant", "1_avg_quant", "3_avg_quant"
+        "1_sum_quant", "2_sum_quant", "3_sum_quant"
     ],
 
     "st" :[
         "1_state = NY", "2_state = NJ", "3_state = CT"
     ],
 
-    "g" : "1_sum_quant > 2 * 2_sum_quant or 1_avg_quant > 3_avg_quant"
+    "g" : "1_sum_quant > 2_sum_quant and 1_sum_quant > 3_sum_quant"
 }
 

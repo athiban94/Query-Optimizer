@@ -4,7 +4,6 @@ import json
 import pandas as pd
 
 def performSum(result, rows, groupbyTup, attrIndex, aggr):
-
     freqStr = 'freq_' + aggr.split('_')[-1]
     for row in rows:
         groupAttriList = []
@@ -62,30 +61,27 @@ try:
         if attrib in dataBaseStruct.keys():
             tup.append(dataBaseStruct[attrib])
 
-    mainResult = {}
-    for aggr in data['f']:
-        if  "sum" in aggr:
-            sum_on_attr = aggr.split('_')[-1]
-            performSum(mainResult, rows, tuple(tup), dataBaseStruct[sum_on_attr], aggr)
-            aggFunctionDict[aggr] = True
+    # mainResult = {}
+    # for aggr in data['f']:
+    #     if  "sum" in aggr:
+    #         sum_on_attr = aggr.split('_')[-1]
+    #         performSum(mainResult, rows, tuple(tup), dataBaseStruct[sum_on_attr], aggr)
+    #         aggFunctionDict[aggr] = True
         
-        if "avg" in aggr:
-            avg_on_attr = aggr.split('_')[-1]
-            if "sum_"+avg_on_attr in aggFunctionDict.keys():
-                performAvg(mainResult, aggr)
-            else:
-                performSum(mainResult, rows, tuple(tup), dataBaseStruct[sum_on_attr], aggr)
-                performAvg(mainResult, aggr)
+    #     if "avg" in aggr:
+    #         avg_on_attr = aggr.split('_')[-1]
+    #         if "sum_"+avg_on_attr in aggFunctionDict.keys():
+    #             performAvg(mainResult, aggr)
+    #         else:
+    #             performSum(mainResult, rows, tuple(tup), dataBaseStruct[sum_on_attr], aggr)
+    #             performAvg(mainResult, aggr)
 
-    for key, value in mainResult.items():
-        for conditions in data['g']:
-            print(type(conditions))
+    # for key, value in mainResult.items():
+    #     for conditions in data['g']:
+    #         print(type(conditions))
         
-
-
     cursor.close()
     conn.close()
-
 
 except Exception as e:
     print("Uh oh, can't connect. Invalid dbname, user or password?")
