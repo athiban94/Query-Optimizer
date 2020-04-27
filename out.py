@@ -2,7 +2,7 @@
 from prettytable import PrettyTable
 import json
 
-with open('query.json') as f:
+with open('query3.json') as f:
     data = json.load(f)
 
 table = PrettyTable()

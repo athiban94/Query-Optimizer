@@ -2,12 +2,14 @@
 Aggregate Functions sum, avg, max, min and count
 
 {
-    cust : {
-        1_sum_quant : 12132
-        1_avg_qunat : 3435
-    }
-}
 
+     "prod", "month", "year" : {
+         "1_sum_quant : 0,
+        "2_sum_quant" : 0,
+     }
+
+}
+   
 
 """
 

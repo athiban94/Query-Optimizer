@@ -1,7 +1,16 @@
 import psycopg2
 import json
-import helperAggr as helper
+import emf_helperAggr as emf_help
 
+"""
+select prod, month, year, sum(x.quant), sum(y.quant)
+    from sales
+        group by prod, month, year ; x,y 
+            such that x.prod = prod and x.month = month and x.year = year,
+                        y.prod = prod and y.year = year
+                    having sum(y.quant) > 10 * sum(x.quant)
+
+"""
 
 try:
     connect_str = "dbname='postgres' user='postgres' host='localhost' "
@@ -14,7 +23,7 @@ cursor = conn.cursor()
 cursor.execute("""SELECT * from sales""")
 rows = cursor.fetchall()
 
-with open('query3.json') as f:
+with open('query.json') as f:
     data = json.load(f)
 
 key = tuple(data['v'])
@@ -29,6 +38,7 @@ dataBaseStruct = {
     "quant": 6
 }
 
+
 """
 Getting all the aggregate functions to be computed - Boolean values for each of them
 """
@@ -36,7 +46,7 @@ aggFunctionDict = {}
 for function in data['f']:
     aggFunctionDict[function] = False
 
-mainResult = {}
+
 
 """
 Grouping variables with their corresponding aggregate functions
@@ -49,6 +59,8 @@ for aggr in data['f']:
                 gV_Aggr[groupVar].append(aggr)
             else:
                 gV_Aggr[groupVar] = [aggr]
+
+
 """
 Grouping variables with their such that conditions
 """
@@ -60,8 +72,10 @@ for aggr in data['st']:
                 gV_suchThat[groupVar].append(aggr)
             else:
                 gV_suchThat[groupVar] = [aggr]
+
+
 """
-Group by attributes indexes
+Group by attributes indexes - a tuple of indexes
 """
 groupByTup = ()
 for attrib in data['v']:
@@ -69,32 +83,37 @@ for attrib in data['v']:
         groupByTup = groupByTup + (dataBaseStruct[attrib],)
 
 """
-Creating separate Data Structures for each aggregate function
+EMF Structure
 """
-for groupVar, value in gV_Aggr.items():
-    for aggr in value:
+mainResult = {}
 
-        if "sum" in aggr:
-            sum_attr = aggr.split('_')[-1]
-            helper.performSum(rows, groupVar, gV_suchThat, sum_attr,
-                            groupByTup, dataBaseStruct, aggr, mainResult, aggFunctionDict)
-        if "avg" in aggr:
-            avg_attr = aggr.split('_')[-1]
-            if str(groupVar)+"_sum_"+avg_attr in aggFunctionDict.keys():
-                if aggFunctionDict[str(groupVar)+"_sum_"+avg_attr] == True:
-                    sum_key = str(groupVar)+"_sum_"+avg_attr
-                    count_key = str(groupVar)+"_count_"+avg_attr
-                    helper.performAvg(mainResult, aggr, sum_key, count_key)
-                    pass
-                else:
-                    # performSum
-                    # performAvg
-                    pass
-            else:
-                # performSum
-                # performAvg
-                pass
+"""
+Generating the Structure according to the grouping 
+attributes along with thier aggregate functions
+"""
+for row in rows:
+    groupList = []
+    for index in groupByTup:
+        groupList.append(row[index])
+    key = tuple(groupList)
+    
+    if key not in mainResult.keys():
+        mainResult[key] = {}
+        for aggrFunction in data['f']:
+            mainResult[key][aggrFunction] = 0
 
+
+for groupVar, aggFunctionList in gV_Aggr.items():
+
+    for aggFunc in aggFunctionList:
+        if "sum" in aggFunc:
+            sum_attr = aggFunc.split('_')[-1]
+            emf_help.performSum(rows, groupVar, gV_suchThat, sum_attr,
+                            groupByTup, dataBaseStruct, aggFunc, mainResult, aggFunctionDict)
+
+
+# for key, value in mainResult.items():
+#     print(key, value)
 
 havingStr = data['g']
 
@@ -103,19 +122,14 @@ for agg in data['f']:
         havingStr = havingStr.replace(agg, "value['" + agg + "']")
 
 
-cursor.close()
-conn.close()
 
-# return finalresult
-
-
-file1 = open("out.py", "w")
+file1 = open("emf_out.py", "w")
 
 outstr = f"""
 from prettytable import PrettyTable
 import json
 
-with open('query3.json') as f:
+with open('query.json') as f:
     data = json.load(f)
 
 table = PrettyTable()
@@ -141,3 +155,9 @@ L = [outstr]
 
 file1.writelines(L)
 file1.close()
+
+
+
+
+
+

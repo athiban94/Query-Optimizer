@@ -1,22 +1,23 @@
+
 {
     "select": [
-        "cust",
-        "1_sum_quant",
-        "2_sum_quant",
-        "3_sum_quant"
+        "prod", "month", "year", "1_sum_quant", "2_sum_quant" 
     ],
-    "n": 3,
+    "n":2,
     "v": [
-        "cust"
+        "prod", "month", "year"
     ],
     "f": [
-        "1_sum_quant", "2_sum_quant", "3_sum_quant", "1_avg_quant", "3_avg_quant"
+        "1_sum_quant", "2_sum_quant"
     ],
 
     "st" :[
-        "1_state = NY", "2_state = NJ", "3_state = CT"
+        "1_prod = prod",  "1_month = month", "1_year = year", "2_prod = prod", "2_year = year"
     ],
 
-    "g" : "1_sum_quant > 2 * 2_sum_quant or 1_avg_quant > 3_avg_quant"
+    "g" : "2_sum_quant > 10 * 1_sum_quant"
 }
+
+
+
 
