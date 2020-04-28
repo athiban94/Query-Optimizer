@@ -1,0 +1,26 @@
+
+{
+    "select": [
+        "cust", "prod", "1_sum_quant", "2_sum_quant", "3_sum_quant"
+    ],
+    "n": 3,
+
+    "v": [
+        "cust", "prod"
+    ],
+    "f": [
+        "1_sum_quant", "2_sum_quant", "3_sum_quant"
+    ],
+
+    "st" :[
+       "1_cust = cust", "1_state = NY", "1_prod = prod",
+        "2_cust = cust", "2_state = NJ" ,
+        "3_state = CT", "3_prod = prod"
+    ],
+
+    "g" : "1_sum_quant > 0.2 * 2_sum_quant and 1_sum_quant > 0.2 * 3_sum_quant"
+}
+
+
+
+
