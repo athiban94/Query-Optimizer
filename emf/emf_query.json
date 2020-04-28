@@ -1,24 +1,24 @@
 
 {
     "select": [
-        "cust", "prod", "1_sum_quant", "2_sum_quant", "3_sum_quant"
+        "cust", "1_avg_quant", "2_avg_quant", "3_avg_quant"
     ],
     "n": 3,
 
     "v": [
-        "cust", "prod"
+        "cust"
     ],
     "f": [
-        "1_sum_quant", "2_sum_quant", "3_sum_quant"
+        "1_avg_quant", "2_avg_quant", "3_avg_quant"
     ],
 
     "st" :[
-       "1_cust = cust", "1_state = NY", "1_prod = prod",
+       "1_cust = cust", "1_state = NY",
         "2_cust = cust", "2_state = NJ" ,
-        "3_state = CT", "3_prod = prod"
+        "3_cust = cust", "3_state = CT"
     ],
 
-    "g" : "1_sum_quant > 0.2 * 2_sum_quant and 1_sum_quant > 0.2 * 3_sum_quant"
+    "g" : "1_avg_quant > 2_avg_quant and 1_avg_quant > 3_avg_quant"
 }
 
 

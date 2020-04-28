@@ -31,7 +31,7 @@ cursor = conn.cursor()
 cursor.execute("""SELECT * from sales""")
 rows = cursor.fetchall()
 
-with open('emf_query.json') as f:
+with open('test_query1.json') as f:
     data = json.load(f)
 
 key = tuple(data['v'])
@@ -56,14 +56,32 @@ dbSchema = {
     "quant": ""
 }
 
+
+""" 
+Generating all the possible aggregate functions other than
+f-vector
+"""
+extraFunc = []
+for func in data['f']:
+    gV = func.split('_')[0]
+    gAtr = func.split('_')[-1]
+    if "avg" in func:
+        if not gV+"_sum_"+gAtr in data['f']:
+            extraFunc.append(gV+"_sum_"+gAtr)
+        if not gV+"_count_"+gAtr in data['f']:
+            extraFunc.append(gV+"_count_"+gAtr)
+    if "sum" in func:
+        if not gV+"_count_"+gAtr in data['f']:
+            extraFunc.append(gV+"_count_"+gAtr)
+
+data['f'].extend(extraFunc)
+        
 """
 Getting all the aggregate functions to be computed - Boolean values for each of them
 """
 aggFunctionDict = {}
 for function in data['f']:
     aggFunctionDict[function] = False
-
-
 
 """
 Grouping variables with their corresponding aggregate functions
@@ -77,7 +95,6 @@ for aggr in data['f']:
             else:
                 gV_Aggr[groupVar] = [aggr]
 
-
 """
 Grouping variables with their such that conditions
 """
@@ -89,7 +106,6 @@ for aggr in data['st']:
                 gV_suchThat[groupVar].append(aggr)
             else:
                 gV_suchThat[groupVar] = [aggr]
-
 
 """
 Group by attributes indexes - a tuple of indexes
@@ -107,6 +123,7 @@ mainResult = {}
 """
 Generating the Structure according to the grouping 
 attributes along with thier aggregate functions
+This dictionary will have all the possible aggregate functions
 """
 for row in rows:
     groupList = []
@@ -119,30 +136,52 @@ for row in rows:
         for aggrFunction in data['f']:
             mainResult[key][aggrFunction] = 0
 
-
 for groupVar, aggFunctionList in gV_Aggr.items():
 
     for aggFunc in aggFunctionList:
+        """
+        for each aggregate function which is present in the aggFuncList, 
+        we are getting the parameters required for the Helper Functions
+        Boolean values for their respective aggFunc are updated in the Helper Functions
+        """
+
+        #performSum function identifies the aggFunc only with sum in 
+        # it and also calculates its corresponding count
 
         if "sum" in aggFunc:
             sum_attr = aggFunc.split('_')[-1]
             emf_help.performSum(rows, groupVar, gV_suchThat, sum_attr,
                             groupByTup, dataBaseStruct, aggFunc, mainResult, aggFunctionDict)
 
+        """
+        Checks if avg and sum are present in the aggFunc
+        If yes, it directly performs the average
+        Else, It calculates, sum and then performs avg
+        """
         if "avg" in aggFunc:
+            avg_attr = aggFunc.split('_')[-1]
+            sum_attr = str(groupVar)+"_sum_"+avg_attr
+            count_attr = str(groupVar)+"_count_"+avg_attr
+            
+            if(aggFunctionDict[sum_attr]):
+                emf_help.performAvg(mainResult, aggFunc, sum_attr, count_attr, aggFunctionDict)
+            else:
+                emf_help.performSum(rows, groupVar, gV_suchThat, avg_attr,
+                            groupByTup, dataBaseStruct, sum_attr, mainResult, aggFunctionDict)
+                emf_help.performAvg(mainResult, aggFunc, sum_attr, count_attr, aggFunctionDict)
+
+        if "max" in aggFunc:
             pass
 
-
-# for key, value in mainResult.items():
-#     print(key, value)
-
+"""
+Having String is directly updated with the condition(string)
+from the query's json file
+"""
 havingStr = data['g']
 
 for agg in data['f']:
     if agg in havingStr:
         havingStr = havingStr.replace(agg, "value['" + agg + "']")
-
-
 
 file1 = open("emf_out.py", "w")
 
@@ -150,7 +189,7 @@ outstr = f"""
 from prettytable import PrettyTable
 import json
 
-with open('emf_query.json') as f:
+with open('test_query1.json') as f:
     data = json.load(f)
 
 table = PrettyTable()

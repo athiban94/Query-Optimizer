@@ -1,0 +1,24 @@
+{
+    "select": [
+        "prod", "month", "1_sum_quant", "2_sum_quant"
+    ],
+    "n": 2,
+
+    "v": [
+        "prod", "month"
+    ],
+    "f": [
+        "1_sum_quant", "2_sum_quant"
+    ],
+
+    "st" :[
+       "1_prod = prod", "1_month = month", "1_state = NY",
+        "2_prod = prod"
+    ],
+
+    "g" : "1_sum_quant < 2_sum_quant"
+}
+
+
+
+

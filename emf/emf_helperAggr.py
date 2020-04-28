@@ -1,25 +1,18 @@
 """
-Aggregate Functions sum, avg, max, min and count
+performSum function performs the sum based on the given parameters
 
-{
-
-     "prod", "month", "year" : {
-         "1_sum_quant : 0,
-        "2_sum_quant" : 0,
-     }
-
-}
-
-"""
-"""
-mainresult --> key ---> prod, month, year
-table --->  (prod, month, year) && (prod, year) && (month,) exist in this row  ( cust, prod, day, month, year, state, quant)
-1: prod, month, year ---> v
-2: prod, year
-3: month
+Ex : 
+1. rows = all the rows in the table
+2. groupVar = 1, 2, 3 etc --> the grouping variable number
+3. suchThat = A dictionary with keys as groupVar and values as their corresponding such that conditions from data['st']
+4. attr = if "1_sum_quant" is to be calculated, attr will "1_sum_quant".split('_')[-1] = quant
+5. groupByTup = Tuple with the group by attributes indexes
+6. dBStruct = Dictionary with keys as attributes of table and the values as the indexes
+7. aggrVar = the Aggregate Function that is to be performed i.e; "1_sum_quant"
+8. mainResult = The main emf structure
+9. aggrDict = Dict with the boolean values of the aggregate functions
 
 """
-
 def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, mainResult, aggrDict):
     gV_group = ()
 
@@ -46,18 +39,48 @@ def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, ma
                     gVTup = gVTup + (ele,)
             
             if(set(gVTup).issubset(key)):
+                """
+                1. Got all the conditions from data['st'] (sunch that condition)
+                we split the conditions in such a way that we got the attribute values 
+                that are to be compared with 
+                2. made the attributes a set, and checked if they are subset of each row from table
+                """
                 if len(nonCondtionCheck) > 0:
                     tup = tuple(nonCondtionCheck)
                     if (set(tup).issubset(row)):
                         value[aggrVar] += row[dbStruct[attr]]
+                        value[str(groupVar)+"_count_"+attr] += 1
+                        
                 else:
                     value[aggrVar] += row[dbStruct[attr]]
-    
+                    value[str(groupVar)+"_count_"+attr] += 1
 
-def performAvg(mainResult, aggr, sum_key, count_key):
+    """
+    Updating the aggFunction Dict (both sum and count) with True as it has been calculated
+    """
+    aggrDict[aggrVar] = True
+    aggrDict[str(groupVar)+"_count_"+attr] = True
+
+"""
+Computing the average aggregate function
+1. mainResult = the main emf structure
+2. aggr = Aggregate function that is to be calculated i.e; "1_avg_quant" etc
+3. sum_key = As required aggregate Functions for avg are sum and count,
+ "1_avg_quant" is parsed and their corresponding sum aggregate function and count aggregate function are formed
+ i.e: "1_sum_quant" and "1_count_quant" 
+4. count_key = Same as sum_key, but the "1_count_quant" function
+5. aggFunctionDict = Booleans values for the calculated aggregate functions
+"""
+def performAvg(mainResult, aggr, sum_key, count_key, aggFunctionDict):
     
     for key, value in mainResult.items():
-        value[aggr] = value[sum_key] / value[count_key]
+            value[aggr] = value[sum_key] / value[count_key]
+        
+    """
+    Updating the aggFunction Dict with True as it has been calculated
+    """
+    aggFunctionDict[aggr] = True
+
 
         
 
