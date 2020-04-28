@@ -1,4 +1,3 @@
-
 {
     "select": [
         "prod", "month", "year", "1_sum_quant", "2_sum_quant" 

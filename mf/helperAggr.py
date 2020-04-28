@@ -9,24 +9,16 @@ Aggregate Functions sum, avg, max, min and count
      }
 
 }
-
-"""
-"""
-mainresult --> key ---> prod, month, year
-table --->  (prod, month, year) && (prod, year) && (month,) exist in this row  ( cust, prod, day, month, year, state, quant)
-1: prod, month, year ---> v
-2: prod, year
-3: month
+   
 
 """
 
 def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, mainResult, aggrDict):
+
     gV_group = ()
     for condition in suchThat[groupVar]:
         groupingAttr = condition.split(" = ")[-1]
         gV_group = gV_group + (dbStruct[groupingAttr],)
-
-
 
     for key, value in mainResult.items():
         for row in rows: 
@@ -39,9 +31,12 @@ def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, ma
             if(set(gVTup).issubset(key)):
                 value[aggrVar] += row[dbStruct[attr]]
     
-    
-   
 
+
+                
+            
+
+    aggrDict[aggrVar] = True
     
 def performAvg(mainResult, aggr, sum_key, count_key):
     

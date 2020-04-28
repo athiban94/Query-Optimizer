@@ -14,3 +14,6 @@ yarn-error.log*
 # Pycache
 __pycache__/
 **/__pycache__/**
+
+emf_out.py
+out.py
