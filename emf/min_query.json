@@ -1,0 +1,24 @@
+{
+    "select": [
+        "cust", "prod", "1_min_quant"
+    ],
+    "n": 3,
+
+    "v": [
+        "prod", "cust"
+    ],
+    "f": [
+        "1_min_quant", "2_min_quant", "3_min_quant"
+    ],
+
+    "st" :[
+       "1_prod = prod", "1_cust = cust", "1_state = NY",
+       "2_prod = prod", "2_cust = cust", "2_state = NJ",
+       "3_prod = prod", "3_cust = cust", "3_state = CT"
+    ],
+
+    "g" : "1_min_quant < 2_min_quant and 1_min_quant < 3_min_quant"
+}
+
+
+

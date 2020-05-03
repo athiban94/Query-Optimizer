@@ -1,6 +1,6 @@
 {
     "select": [
-        "prod", "month", "1_sum_quant", "2_sum_quant"
+        "prod", "month", "1_sum_quant", "1_count_quant", "2_sum_quant"
     ],
     "n": 2,
 
@@ -8,7 +8,7 @@
         "prod", "month"
     ],
     "f": [
-        "1_sum_quant", "2_sum_quant"
+        "1_sum_quant", "2_sum_quant", "1_count_quant"
     ],
 
     "st" :[
@@ -16,7 +16,7 @@
         "2_prod = prod"
     ],
 
-    "g" : "1_sum_quant < 2_sum_quant"
+    "g" : "1_sum_quant < 2_sum_quant and 1_count_quant > 0"
 }
 
 

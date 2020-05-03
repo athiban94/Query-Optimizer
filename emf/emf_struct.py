@@ -1,6 +1,7 @@
 import psycopg2
 import json
 import emf_helperAggr as emf_help
+import sys
 
 """
 select prod, month, year, sum(x.quant), sum(y.quant)
@@ -18,6 +19,14 @@ select cust,sum(x.sale),sum(y.sale),sum(z.sale)
                         z.cust = cust and z.state = “NJ” 
         having sum(x.sale) > sum(y.sale) and sum(x.sale) > sum(z.sale)
 
+
+with t1 as (select cust, prod, min(quant) as x_min from sales where state = 'NY' group by cust, prod),
+t2 as (select cust, prod, min(quant) as y_min from sales where state = 'NJ' group by cust, prod),
+t3 as (select cust, prod, min(quant) as z_min from sales where state = 'CT' group by cust, prod)
+select t1.cust , t1.prod, x_min
+from t1, t2, t3 
+where t1.cust = t2.cust and t2.cust = t3.cust and t1.prod = t2.prod and t2.prod = t3.prod and x_min > y_min and x_min > z_min
+ 
 """
 
 try:
@@ -31,7 +40,7 @@ cursor = conn.cursor()
 cursor.execute("""SELECT * from sales""")
 rows = cursor.fetchall()
 
-with open('test_query1.json') as f:
+with open('min_query.json') as f:
     data = json.load(f)
 
 key = tuple(data['v'])
@@ -134,7 +143,18 @@ for row in rows:
     if key not in mainResult.keys():
         mainResult[key] = {}
         for aggrFunction in data['f']:
-            mainResult[key][aggrFunction] = 0
+            if "min" in aggrFunction:
+                mainResult[key][aggrFunction] = sys.maxsize
+            else:
+                mainResult[key][aggrFunction] = 0
+
+
+# print(gV_Aggr)
+# print(aggFunctionDict)
+
+for key, value in mainResult.items():
+    print(key , value)
+
 
 for groupVar, aggFunctionList in gV_Aggr.items():
 
@@ -168,10 +188,21 @@ for groupVar, aggFunctionList in gV_Aggr.items():
             else:
                 emf_help.performSum(rows, groupVar, gV_suchThat, avg_attr,
                             groupByTup, dataBaseStruct, sum_attr, mainResult, aggFunctionDict)
+                emf_help.performCount(rows, groupVar, gV_suchThat, avg_attr,
+                            groupByTup, dataBaseStruct, count_attr, mainResult, aggFunctionDict)           
                 emf_help.performAvg(mainResult, aggFunc, sum_attr, count_attr, aggFunctionDict)
 
-        if "max" in aggFunc:
-            pass
+        if "min" in aggFunc:
+            min_attr = aggFunc.split('_')[-1]
+            emf_help.performMin(rows, groupVar, min_attr, aggFunc, gV_suchThat, groupByTup, dataBaseStruct, 
+                            mainResult, aggFunctionDict)
+        
+        if "count" in aggFunc:
+            count_attr = aggFunc.split('_')[-1]
+            emf_help.performCount(rows, groupVar, gV_suchThat, count_attr, groupByTup, 
+                                    dataBaseStruct, aggFunc, mainResult, aggFunctionDict)
+
+            
 
 """
 Having String is directly updated with the condition(string)
@@ -189,7 +220,7 @@ outstr = f"""
 from prettytable import PrettyTable
 import json
 
-with open('test_query1.json') as f:
+with open('min_query.json') as f:
     data = json.load(f)
 
 table = PrettyTable()

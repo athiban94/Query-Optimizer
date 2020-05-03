@@ -13,6 +13,9 @@ Ex :
 9. aggrDict = Dict with the boolean values of the aggregate functions
 
 """
+import sys
+
+
 def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, mainResult, aggrDict):
     gV_group = ()
 
@@ -29,15 +32,15 @@ def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, ma
     for cond in nonAttrCondtionList:
         rowValue = cond.split(" = ")[-1]
         nonCondtionCheck.append(rowValue)
-    
+
     for key, value in mainResult.items():
-        for row in rows: 
+        for row in rows:
 
             gVTup = ()
             for idx, ele in enumerate(row):
                 if(idx in gV_group):
                     gVTup = gVTup + (ele,)
-            
+
             if(set(gVTup).issubset(key)):
                 """
                 1. Got all the conditions from data['st'] (sunch that condition)
@@ -49,17 +52,18 @@ def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, ma
                     tup = tuple(nonCondtionCheck)
                     if (set(tup).issubset(row)):
                         value[aggrVar] += row[dbStruct[attr]]
-                        value[str(groupVar)+"_count_"+attr] += 1
-                        
+                        # value[str(groupVar)+"_count_"+attr] += 1
+
                 else:
                     value[aggrVar] += row[dbStruct[attr]]
-                    value[str(groupVar)+"_count_"+attr] += 1
+                    # value[str(groupVar)+"_count_"+attr] += 1
 
     """
     Updating the aggFunction Dict (both sum and count) with True as it has been calculated
     """
     aggrDict[aggrVar] = True
-    aggrDict[str(groupVar)+"_count_"+attr] = True
+    # aggrDict[str(groupVar)+"_count_"+attr] = True
+
 
 """
 Computing the average aggregate function
@@ -71,17 +75,113 @@ Computing the average aggregate function
 4. count_key = Same as sum_key, but the "1_count_quant" function
 5. aggFunctionDict = Booleans values for the calculated aggregate functions
 """
+
+
 def performAvg(mainResult, aggr, sum_key, count_key, aggFunctionDict):
-    
+
     for key, value in mainResult.items():
-            value[aggr] = value[sum_key] / value[count_key]
-        
+        value[aggr] = value[sum_key] / value[count_key]
+
     """
     Updating the aggFunction Dict with True as it has been calculated
     """
     aggFunctionDict[aggr] = True
 
 
-        
+def performCount(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, mainResult, aggrDict):
+    # aggrDict[aggrVar] = False
+    gV_group = ()
+
+    nonAttrCondtionList = []
+
+    for condition in suchThat[groupVar]:
+        groupingAttr = condition.split(" = ")[-1]
+        if groupingAttr in dbStruct.keys():
+            gV_group = gV_group + (dbStruct[groupingAttr],)
+        else:
+            nonAttrCondtionList.append(condition)
+
+    nonCondtionCheck = []
+    for cond in nonAttrCondtionList:
+        rowValue = cond.split(" = ")[-1]
+        nonCondtionCheck.append(rowValue)
+
+    for key, value in mainResult.items():
+        for row in rows:
+
+            gVTup = ()
+            for idx, ele in enumerate(row):
+                if(idx in gV_group):
+                    gVTup = gVTup + (ele,)
+
+            if(set(gVTup).issubset(key)):
+                """
+                1. Got all the conditions from data['st'] (sunch that condition)
+                we split the conditions in such a way that we got the attribute values 
+                that are to be compared with 
+                2. made the attributes a set, and checked if they are subset of each row from table
+                """
+                if len(nonCondtionCheck) > 0:
+                    tup = tuple(nonCondtionCheck)
+                    if (set(tup).issubset(row)):
+                        value[aggrVar] += 1
+
+                else:
+                    value[aggrVar] += 1
+
+    aggrDict[aggrVar] = True
+
+
+def performMin(rows, groupVar, attr,  aggrVar, suchThat,  groupByTup, dbStruct,mainResult, aggrDict):
+    gV_group = ()
+    nonAttrCondtionList = []
+
+    for condition in suchThat[groupVar]:
+        groupingAttr = condition.split(" = ")[-1]
+        if groupingAttr in dbStruct.keys():
+            gV_group = gV_group + (dbStruct[groupingAttr],)
+        else:
+            nonAttrCondtionList.append(condition)
+
+    nonCondtionCheck = []
+    for cond in nonAttrCondtionList:
+        rowValue = cond.split(" = ")[-1]
+        nonCondtionCheck.append(rowValue)
+
+    for key, value in mainResult.items():
+        for row in rows:
+
+            gVTup = ()
+            for idx, ele in enumerate(row):
+                if(idx in gV_group):
+                    gVTup = gVTup + (ele,)
+
+            if(set(gVTup).issubset(key)):
+                """
+                1. Got all the conditions from data['st'] (sunch that condition)
+                we split the conditions in such a way that we got the attribute values 
+                that are to be compared with 
+                2. made the attributes a set, and checked if they are subset of each row from table
+                """
+                if len(nonCondtionCheck) > 0:
+                    tup = tuple(nonCondtionCheck)
+                    if (set(tup).issubset(row)):
+                        if(value[aggrVar] > row[dbStruct[attr]]):
+                            value[aggrVar] = row[dbStruct[attr]]
+                        # if(min_value >= row[dbStruct[attr]]):
+                        #     min_value = row[dbStruct[attr]]
+                        # print(gVTup ,groupVar, row[dbStruct[attr]])
+                        pass
+                else:
+                    if(value[aggrVar] > row[dbStruct[attr]]):
+                        value[aggrVar] = row[dbStruct[attr]]
+                    # if(min_value >= row[dbStruct[attr]]):
+                    #     min_value = row[dbStruct[attr]]
+    # print(min_value)
+    # print(aggrVar)
+    # print("====================")
+    # value[aggrVar] = min(min_list)
+    aggrDict[aggrVar] = True
+
 
 
