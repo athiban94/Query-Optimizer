@@ -40,7 +40,7 @@ cursor = conn.cursor()
 cursor.execute("""SELECT * from sales""")
 rows = cursor.fetchall()
 
-with open('min_query.json') as f:
+with open('emf_query.json') as f:
     data = json.load(f)
 
 key = tuple(data['v'])
@@ -149,13 +149,6 @@ for row in rows:
                 mainResult[key][aggrFunction] = 0
 
 
-# print(gV_Aggr)
-# print(aggFunctionDict)
-
-for key, value in mainResult.items():
-    print(key , value)
-
-
 for groupVar, aggFunctionList in gV_Aggr.items():
 
     for aggFunc in aggFunctionList:
@@ -201,9 +194,13 @@ for groupVar, aggFunctionList in gV_Aggr.items():
             count_attr = aggFunc.split('_')[-1]
             emf_help.performCount(rows, groupVar, gV_suchThat, count_attr, groupByTup, 
                                     dataBaseStruct, aggFunc, mainResult, aggFunctionDict)
+        
+        if "max" in aggFunc:
+            max_attr = aggFunc.split('_')[-1]
+            emf_help.performMax(rows, groupVar, max_attr, aggFunc, gV_suchThat, groupByTup, dataBaseStruct, 
+                            mainResult, aggFunctionDict)
 
             
-
 """
 Having String is directly updated with the condition(string)
 from the query's json file
@@ -219,8 +216,9 @@ file1 = open("emf_out.py", "w")
 outstr = f"""
 from prettytable import PrettyTable
 import json
+import sys
 
-with open('min_query.json') as f:
+with open('emf_query.json') as f:
     data = json.load(f)
 
 table = PrettyTable()
@@ -239,8 +237,14 @@ for key, value in {mainResult}.items():
                 if(projAttr == k):
                     table_row.append(val)
 
-        table.add_row(table_row)
         count += 1
+        if "max" or "min" in value.keys():
+            if (sys.maxsize in value.values() or 0 in value.values()):
+                pass
+            else:
+                table.add_row(table_row)
+        else:
+            table.add_row(table_row)
 print(table)
 print(count)
 
