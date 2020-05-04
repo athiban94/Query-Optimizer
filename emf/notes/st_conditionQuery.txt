@@ -1,0 +1,18 @@
+ENGLISH
+========
+
+Find for each customer and for each month of 1997 the
+customer's average sale before, during and after this month.
+
+
+EMF:
+=========
+select cust,month,avg(x.sale),avg(sale),avg(y.sale)
+    from Sales
+            group by cust, month ; x, y
+                such that x.cust = cust and x.month < month,
+                            y.cust = cust and y.month > month
+
+SQL:
+==========
+

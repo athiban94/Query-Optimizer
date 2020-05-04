@@ -1,6 +1,6 @@
 import json
 file1 = open("emf_bot.py", "w")
-queryFile = 'test_query1.json'
+queryFile = 'queries/emf_query.json'
 
 dataBaseStruct = {
     "cust": 0,
@@ -115,16 +115,60 @@ for key, value in aggrComponents.items():
             auto_aggr_functions = auto_aggr_functions + maxComponent
 
 
+generateTableComponent = """
+    table_row = []
+
+    for ele in key:
+        table_row.append(ele)
+    
+    for projAttr in data['select']:
+        for k, val in value.items():
+            if(projAttr == k):
+                table_row.append(val)
+    
+    if "max" or "min" in value.keys():
+        if (sys.maxsize in value.values() or 0 in value.values()):
+            pass
+        else:
+            table.add_row(table_row)
+    else:
+        table.add_row(table_row)
+"""
+
 """
 Having String is directly updated with the condition(string)
 from the query's json file
 """
+
 havingStr = data['g']
 
 for agg in data['f']:
     if agg in havingStr:
         havingStr = havingStr.replace(agg, "value['" + agg + "']")
 
+if len(data['g']) > 0:
+    generateTableComponent = f"""
+        if {havingStr}:
+            table_row = []
+
+            for ele in key:
+                table_row.append(ele)
+            
+            for projAttr in data['select']:
+                for k, val in value.items():
+                    if(projAttr == k):
+                        table_row.append(val)
+            
+            if "max" or "min" in value.keys():
+                if (sys.maxsize in value.values() or 0 in value.values()):
+                    pass
+                else:
+                    table.add_row(table_row)
+            else:
+                table.add_row(table_row)
+
+    """
+    
 outstr = f"""
 import psycopg2
 import json
@@ -260,24 +304,7 @@ table = PrettyTable()
 table.field_names = data['select']
 
 for key, value in mainResult.items():
-    if {havingStr}:
-        table_row = []
-
-        for ele in key:
-            table_row.append(ele)
-        
-        for projAttr in data['select']:
-            for k, val in value.items():
-                if(projAttr == k):
-                    table_row.append(val)
-        
-        if "max" or "min" in value.keys():
-            if (sys.maxsize in value.values() or 0 in value.values()):
-                pass
-            else:
-                table.add_row(table_row)
-        else:
-            table.add_row(table_row)
+    {generateTableComponent}
 
 print(table)
 

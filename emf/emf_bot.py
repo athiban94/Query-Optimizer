@@ -19,7 +19,7 @@ cursor = conn.cursor()
 cursor.execute('''SELECT * from sales''')
 rows = cursor.fetchall()
 
-with open('test_query1.json') as f:
+with open('queries/emf_query.json') as f:
     data = json.load(f)
 
 dataBaseStruct = {'cust': 0, 'prod': 1, 'day': 2, 'month': 3, 'year': 4, 'state': 5, 'quant': 6}
@@ -130,6 +130,21 @@ for groupVar, aggFunctionList in gV_Aggr.items():
                             groupByTup, dataBaseStruct, aggFunc, mainResult, aggFunctionDict)
 
 
+        if "avg" in aggFunc:
+            avg_attr = aggFunc.split('_')[-1]
+            sum_attr = str(groupVar)+"_sum_"+avg_attr
+            count_attr = str(groupVar)+"_count_"+avg_attr
+            
+            if(aggFunctionDict[sum_attr]):
+                emf_help.performAvg(mainResult, aggFunc, sum_attr, count_attr, aggFunctionDict)
+            else:
+                emf_help.performSum(rows, groupVar, gV_suchThat, avg_attr,
+                            groupByTup, dataBaseStruct, sum_attr, mainResult, aggFunctionDict)
+                emf_help.performCount(rows, groupVar, gV_suchThat, avg_attr,
+                            groupByTup, dataBaseStruct, count_attr, mainResult, aggFunctionDict)           
+                emf_help.performAvg(mainResult, aggFunc, sum_attr, count_attr, aggFunctionDict)
+
+
         if "count" in aggFunc:
             count_attr = aggFunc.split('_')[-1]
             emf_help.performCount(rows, groupVar, gV_suchThat, count_attr, groupByTup, 
@@ -145,24 +160,25 @@ table = PrettyTable()
 table.field_names = data['select']
 
 for key, value in mainResult.items():
-    if value['1_sum_quant'] < value['2_sum_quant'] and value['1_count_quant'] > 0:
-        table_row = []
+    
+    table_row = []
 
-        for ele in key:
-            table_row.append(ele)
-        
-        for projAttr in data['select']:
-            for k, val in value.items():
-                if(projAttr == k):
-                    table_row.append(val)
-        
-        if "max" or "min" in value.keys():
-            if (sys.maxsize in value.values() or 0 in value.values()):
-                pass
-            else:
-                table.add_row(table_row)
+    for ele in key:
+        table_row.append(ele)
+    
+    for projAttr in data['select']:
+        for k, val in value.items():
+            if(projAttr == k):
+                table_row.append(val)
+    
+    if "max" or "min" in value.keys():
+        if (sys.maxsize in value.values() or 0 in value.values()):
+            pass
         else:
             table.add_row(table_row)
+    else:
+        table.add_row(table_row)
+
 
 print(table)
 

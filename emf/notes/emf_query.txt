@@ -1,0 +1,71 @@
+EMF_QUERY.JSON: 
+
+ENGLISH:
+========
+Find for each customer the average sale in “NY”, 
+the average sale in “CT” and the average sale in “NJ”, 
+if New York’s average is greater than the other two.
+
+
+EMF:
+===
+
+select cust, avg(x.quant), avg(y.quant), avg(z.quant)
+from sales
+group by cust; x, y, z
+such that x.cust = cust and x.state = NY
+            y.cust = cust and y.state = NJ
+            z.cust = cust and z.state = CT
+having avg(x.quant) > avg(y.quant) and avg(x.quant) > avg(z.quant)
+
+SQL:
+====
+with 
+t1 as (select cust, avg(quant) as ny from sales where state = 'NY' group by cust ),
+t2 as (select cust, avg(quant) as nj from sales where state = 'NJ' group by cust ),
+t3 as (select cust, avg(quant) as ct from sales where state = 'CT' group by cust )
+select t1.cust, ny, nj, ct
+from t1, t2, t3
+where t1.cust = t2.cust and t2.cust = t3.cust and ny > nj and ny > ct
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select cust,sum(x.sale),sum(y.sale),sum(z.sale)
+    from Sales
+        group by cust; x,y,z
+        such that x.cust = cust and x.state=“NY”, 
+                    y.cust = cust and y.state = “CT”,
+                        z.cust = cust and z.state = “NJ” 
+        having sum(x.sale) > sum(y.sale) and sum(x.sale) > sum(z.sale)
+
+
+select product, sum(X.quantity), sum(Y.quantity), sum(Z.quantity)
+    from Sales
+        where year=‘‘1997’’
+            group by product : X, Y, Z such that X.month = 1,
+                Y.month = 2, Z.month = 3
+
+* Getting rows which has 0 value in it. (How to fix ?)
+
+    Avg must be fixed
+    min max bug needs to be fixed
+    document properly
+    ppt 
+    Need to add >,<,!= in the such that conditions
+    Month —> failed 
+
+    Min max, we need to fix for avg
