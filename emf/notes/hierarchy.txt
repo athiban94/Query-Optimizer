@@ -1,0 +1,28 @@
+ENGLISH
+==============
+For each product, show each month’s
+total sales and it's year-long total sales
+
+EMF
+==============
+
+select prod, month, sum(x.sale), sum(y.sale)
+from sales
+group by prod,month ; x,y
+such thatx.prod = prod and x.month = month,
+y.prod = prod
+
+
+SQL
+===============
+with 
+t1 as (select prod, month, sum(quant) as x_sale from sales
+group by prod, month),
+
+t2 as (select prod, avg(quant) as y_sale from sales group by prod)
+
+select t1.prod, t1.month, t1.x_sale, t2.y_sale
+from t1, t2
+	where t1.prod = t2.prod and x_sale > y_sale
+
+

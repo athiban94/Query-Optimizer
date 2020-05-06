@@ -66,6 +66,6 @@ select product, sum(X.quantity), sum(Y.quantity), sum(Z.quantity)
     document properly
     ppt 
     Need to add >,<,!= in the such that conditions
-    Month —> failed 
+   
 
     Min max, we need to fix for avg

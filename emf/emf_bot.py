@@ -19,10 +19,21 @@ cursor = conn.cursor()
 cursor.execute('''SELECT * from sales''')
 rows = cursor.fetchall()
 
-with open('queries/emf_query.json') as f:
+with open('queries/mq.json') as f:
     data = json.load(f)
 
 dataBaseStruct = {'cust': 0, 'prod': 1, 'day': 2, 'month': 3, 'year': 4, 'state': 5, 'quant': 6}
+
+
+extra_st = []
+if 'mf' in data:
+    for gv in range(1, data['n'] +  1, 1):
+        for attr in data['v']:
+            r = str(gv) + '_' + attr + ' = ' + attr
+            extra_st.append(r)
+
+    data['st'].extend(extra_st)
+
 
 '''
 Generating all the possible aggregate functions other than
@@ -67,8 +78,9 @@ Grouping variables with their such that conditions
 '''
 gV_suchThat = {}
 for aggr in data['st']:
+    aggr_one = aggr.split('=')[0]
     for groupVar in range(1, data['n']+1):
-        if str(groupVar) in aggr:
+        if str(groupVar) in aggr_one:
             if groupVar in gV_suchThat:
                 gV_suchThat[groupVar].append(aggr)
             else:
@@ -130,21 +142,6 @@ for groupVar, aggFunctionList in gV_Aggr.items():
                             groupByTup, dataBaseStruct, aggFunc, mainResult, aggFunctionDict)
 
 
-        if "avg" in aggFunc:
-            avg_attr = aggFunc.split('_')[-1]
-            sum_attr = str(groupVar)+"_sum_"+avg_attr
-            count_attr = str(groupVar)+"_count_"+avg_attr
-            
-            if(aggFunctionDict[sum_attr]):
-                emf_help.performAvg(mainResult, aggFunc, sum_attr, count_attr, aggFunctionDict)
-            else:
-                emf_help.performSum(rows, groupVar, gV_suchThat, avg_attr,
-                            groupByTup, dataBaseStruct, sum_attr, mainResult, aggFunctionDict)
-                emf_help.performCount(rows, groupVar, gV_suchThat, avg_attr,
-                            groupByTup, dataBaseStruct, count_attr, mainResult, aggFunctionDict)           
-                emf_help.performAvg(mainResult, aggFunc, sum_attr, count_attr, aggFunctionDict)
-
-
         if "count" in aggFunc:
             count_attr = aggFunc.split('_')[-1]
             emf_help.performCount(rows, groupVar, gV_suchThat, count_attr, groupByTup, 
@@ -171,13 +168,13 @@ for key, value in mainResult.items():
             if(projAttr == k):
                 table_row.append(val)
     
-    if "max" or "min" in value.keys():
-        if (sys.maxsize in value.values() or 0 in value.values()):
-            pass
-        else:
-            table.add_row(table_row)
-    else:
-        table.add_row(table_row)
+    # if "max" or "min" in value.keys():
+    #     if (sys.maxsize in value.values() or 0 in value.values()):
+    #         pass
+    #     else:
+    #         table.add_row(table_row)
+    # else:
+    table.add_row(table_row)
 
 
 print(table)

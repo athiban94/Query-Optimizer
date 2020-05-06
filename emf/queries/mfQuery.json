@@ -1,0 +1,25 @@
+{
+    "mf" : "mf_query",
+    "select": [
+        "cust",
+        "1_avg_quant",
+        "2_avg_quant",
+        "3_avg_quant"
+    ],
+    "n": 3,
+    "v": [
+        "cust"
+    ],
+    "f": [
+        "1_avg_quant",
+        "2_avg_quant",
+        "3_avg_quant"
+    ],
+    "st": [
+        "1_state = NY",
+        "2_state = NJ",
+        "3_state = CT"
+    ],
+    "g": "1_avg_quant > 2_avg_quant and 1_avg_quant > 3_avg_quant"
+   
+}

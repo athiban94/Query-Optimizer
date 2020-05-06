@@ -1,0 +1,22 @@
+EMF
+===
+select product, sum(X.quantity),
+sum(Y.quantity), sum(Z.quantity)
+from Sales
+group by product : X, Y, Z
+such that X.month = 1,
+Y.month = 2
+
+
+
+
+SQL
+====
+with
+t1 as (select prod, sum(quant) as x_quant from sales where month = 1 group by prod),
+t2 as (select prod, sum(quant) as y_quant from sales where month = 2 group by prod),
+t3 as (select prod, sum(quant) as z_quant from sales where month = 3 group by prod)
+
+select t1.prod, x_quant, y_quant, z_quant
+from t1, t2, t3
+where t1.prod = t2.prod and t2.prod = t3.prod

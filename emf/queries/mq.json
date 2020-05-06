@@ -1,0 +1,25 @@
+{
+    "mf" : "mf_query",
+    "select": [
+        "prod",
+        "1_sum_quant",
+        "2_sum_quant",
+        "3_sum_quant"
+    ],
+    "n": 3,
+    "v": [
+        "prod"
+    ],
+    "f": [
+        "1_sum_quant",
+        "2_sum_quant",
+        "3_sum_quant"
+    ],
+    "st": [
+        "1_month = 1",
+        "2_month = 2",
+        "3_month = 3"
+    ],
+    "g": ""
+   
+}

@@ -1,6 +1,6 @@
 import json
 file1 = open("emf_bot.py", "w")
-queryFile = 'queries/emf_query.json'
+queryFile = 'queries/mq.json'
 
 dataBaseStruct = {
     "cust": 0,
@@ -15,6 +15,16 @@ dataBaseStruct = {
 with open(queryFile) as f:
     data = json.load(f)
 
+mf_Component = '''
+extra_st = []
+if 'mf' in data:
+    for gv in range(1, data['n'] +  1, 1):
+        for attr in data['v']:
+            r = str(gv) + '_' + attr + ' = ' + attr
+            extra_st.append(r)
+
+    data['st'].extend(extra_st)
+'''
 
 sumComponent = """
         if "sum" in aggFunc:
@@ -126,13 +136,13 @@ generateTableComponent = """
             if(projAttr == k):
                 table_row.append(val)
     
-    if "max" or "min" in value.keys():
-        if (sys.maxsize in value.values() or 0 in value.values()):
-            pass
-        else:
-            table.add_row(table_row)
-    else:
-        table.add_row(table_row)
+    # if "max" or "min" in value.keys():
+    #     if (sys.maxsize in value.values() or 0 in value.values()):
+    #         pass
+    #     else:
+    #         table.add_row(table_row)
+    # else:
+    table.add_row(table_row)
 """
 
 """
@@ -159,13 +169,13 @@ if len(data['g']) > 0:
                     if(projAttr == k):
                         table_row.append(val)
             
-            if "max" or "min" in value.keys():
-                if (sys.maxsize in value.values() or 0 in value.values()):
-                    pass
-                else:
-                    table.add_row(table_row)
-            else:
-                table.add_row(table_row)
+            # if "max" or "min" in value.keys():
+            #     if (sys.maxsize in value.values() or 0 in value.values()):
+            #         pass
+            #     else:
+            #         table.add_row(table_row)
+            # else:
+            table.add_row(table_row)
 
     """
     
@@ -194,6 +204,8 @@ with open('{queryFile}') as f:
     data = json.load(f)
 
 dataBaseStruct = {dataBaseStruct}
+
+{mf_Component}
 
 '''
 Generating all the possible aggregate functions other than
@@ -238,8 +250,9 @@ Grouping variables with their such that conditions
 '''
 gV_suchThat = {{}}
 for aggr in data['st']:
+    aggr_one = aggr.split('=')[0]
     for groupVar in range(1, data['n']+1):
-        if str(groupVar) in aggr:
+        if str(groupVar) in aggr_one:
             if groupVar in gV_suchThat:
                 gV_suchThat[groupVar].append(aggr)
             else:

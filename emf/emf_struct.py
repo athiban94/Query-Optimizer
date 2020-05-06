@@ -40,7 +40,7 @@ cursor = conn.cursor()
 cursor.execute("""SELECT * from sales""")
 rows = cursor.fetchall()
 
-with open('max_query.json') as f:
+with open('queries/mfQuery.json') as f:
     data = json.load(f)
 
 key = tuple(data['v'])
@@ -54,6 +54,17 @@ dataBaseStruct = {
     "state": 5,
     "quant": 6
 }
+
+extra_st = []
+if 'mf' in data:
+    for gv in range(1, data['n'] +  1, 1):
+        for attr in data['v']:
+            r = str(gv) + "_" + attr + " = " + attr
+            extra_st.append(r)
+    data['st'].extend(extra_st)
+
+print(data['st'])
+
 
 """ 
 Generating all the possible aggregate functions other than
@@ -212,7 +223,7 @@ from prettytable import PrettyTable
 import json
 import sys
 
-with open('max_query.json') as f:
+with open('queries/mfQuery.json') as f:
     data = json.load(f)
 
 table = PrettyTable()
