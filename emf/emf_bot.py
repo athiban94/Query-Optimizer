@@ -19,7 +19,7 @@ cursor = conn.cursor()
 cursor.execute('''SELECT * from sales''')
 rows = cursor.fetchall()
 
-with open('queries/mq.json') as f:
+with open('queries/min_query.json') as f:
     data = json.load(f)
 
 dataBaseStruct = {'cust': 0, 'prod': 1, 'day': 2, 'month': 3, 'year': 4, 'state': 5, 'quant': 6}
@@ -136,17 +136,10 @@ for groupVar, aggFunctionList in gV_Aggr.items():
         Boolean values for their respective aggFunc are updated in the Helper Functions
         '''
         
-        if "sum" in aggFunc:
-            sum_attr = aggFunc.split('_')[-1]
-            emf_help.performSum(rows, groupVar, gV_suchThat, sum_attr,
-                            groupByTup, dataBaseStruct, aggFunc, mainResult, aggFunctionDict)
-
-
-        if "count" in aggFunc:
-            count_attr = aggFunc.split('_')[-1]
-            emf_help.performCount(rows, groupVar, gV_suchThat, count_attr, groupByTup, 
-                                    dataBaseStruct, aggFunc, mainResult, aggFunctionDict)
-        
+        if "min" in aggFunc:
+            min_attr = aggFunc.split('_')[-1]
+            emf_help.performMin(rows, groupVar, min_attr, aggFunc, gV_suchThat, groupByTup, dataBaseStruct, 
+                            mainResult, aggFunctionDict)
 
 
 
@@ -158,24 +151,26 @@ table.field_names = data['select']
 
 for key, value in mainResult.items():
     
-    table_row = []
+        if value['1_min_quant'] < value['2_min_quant'] and value['1_min_quant'] < value['3_min_quant']:
+            table_row = []
 
-    for ele in key:
-        table_row.append(ele)
-    
-    for projAttr in data['select']:
-        for k, val in value.items():
-            if(projAttr == k):
-                table_row.append(val)
-    
-    # if "max" or "min" in value.keys():
-    #     if (sys.maxsize in value.values() or 0 in value.values()):
-    #         pass
-    #     else:
-    #         table.add_row(table_row)
-    # else:
-    table.add_row(table_row)
+            for ele in key:
+                table_row.append(ele)
+            
+            for projAttr in data['select']:
+                for k, val in value.items():
+                    if(projAttr == k):
+                        table_row.append(val)
+            
+            # if "max" or "min" in value.keys():
+            #     if (sys.maxsize in value.values() or 0 in value.values()):
+            #         pass
+            #     else:
+            #         table.add_row(table_row)
+            # else:
+            table.add_row(table_row)
 
+    
 
 print(table)
 

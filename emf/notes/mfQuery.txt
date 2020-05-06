@@ -5,6 +5,13 @@ Find for each customer the average sale in “NY”,
 the average sale in “CT” and the average sale in “NJ”, 
 if New York’s average is greater than the other two.
 
+ENGLISH
+=======
+Find for each customer the average sale in “NY”, 
+the average sale in “CT” and the average sale in “NJ”, 
+if New York’s average is greater than the other two.
+
+
 MF
 ================
 select cust, sum(x.quant), sum(y.quant), sum(z.quant) 

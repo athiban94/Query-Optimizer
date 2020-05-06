@@ -1,6 +1,6 @@
 import json
 file1 = open("emf_bot.py", "w")
-queryFile = 'queries/mq.json'
+queryFile = 'queries/min_query.json'
 
 dataBaseStruct = {
     "cust": 0,

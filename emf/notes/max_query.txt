@@ -1,0 +1,28 @@
+ENGLISH
+=======
+For each product and customer combination find the maximum 
+sale in the state NY, NJ and CT if the maximum sales in NY is 
+less than the max sales in NJ and max sales in CT.
+
+EMF
+===
+select prod, cust, max(x.quant), max(y.quant), max(z.quant)
+from sales
+group by prod, cust; x, y, z
+such that x.prod = prod and x.cust = cust and x.state = NY
+            y.prod = prod and y.cust = cust and y.state = NJ
+                z.prod = prod and z.cust = cust and z.state = CT
+having max(x.quant) < max(y.quant) and max(x.quant) < max(z.quant)
+
+SQL
+===
+with 
+t1 as (select prod, cust, max(quant) as x_quant from sales where state = 'NY' group by prod, cust),
+t2 as (select prod, cust, max(quant) as y_quant from sales where state = 'NJ' group by prod, cust),
+t3 as (select prod, cust, max(quant) as z_quant from sales where state = 'CT' group by prod, cust)
+
+select t1.prod, t1.cust, x_quant, y_quant, z_quant
+from t1, t2, t3
+where t1.prod = t2.prod and t2.prod = t3.prod
+		and t1.cust = t2.cust and t2.cust = t3.cust
+		and x_quant < y_quant and x_quant < z_quant

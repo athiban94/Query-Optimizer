@@ -1,1 +1,0 @@
-1. appending the extra aggregate functions into the data['f'] 

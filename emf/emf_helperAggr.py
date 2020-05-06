@@ -28,7 +28,6 @@ def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, ma
         else:
             nonAttrCondtionList.append(condition)
 
-    print(nonAttrCondtionList)
     nonCondtionCheck = []
     condAttrIndex = []
     for cond in nonAttrCondtionList:
@@ -36,11 +35,8 @@ def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, ma
         rr1 = cond.split(" = ")[0]
         cond_attr = rr1.split('_')[-1]
         condAttrIndex.append(dbStruct[cond_attr])
-        print(dbStruct[cond_attr], rowValue)
         nonCondtionCheck.append(rowValue)
     
-    print(condAttrIndex)
-        
 
     for key, value in mainResult.items():
         for row in rows:
@@ -68,9 +64,6 @@ def performSum(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, ma
                     for idx, rVal in enumerate(rowStrTup):
                         if idx in condAttrIndex:
                             valuesToCmp = valuesToCmp + (rVal, ) 
-
-                    # if groupVar == 1:
-                    #     print(set(tup), rowStrTup, condAttrIndex, set(valuesToCmp))
 
                     if (set(tup) == set(valuesToCmp)):
                         value[aggrVar] += row[dbStruct[attr]]
@@ -122,8 +115,12 @@ def performCount(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, 
             nonAttrCondtionList.append(condition)
 
     nonCondtionCheck = []
+    condAttrIndex = []
     for cond in nonAttrCondtionList:
         rowValue = cond.split(" = ")[-1]
+        rr1 = cond.split(" = ")[0]
+        cond_attr = rr1.split('_')[-1]
+        condAttrIndex.append(dbStruct[cond_attr])
         nonCondtionCheck.append(rowValue)
 
     for key, value in mainResult.items():
@@ -143,7 +140,17 @@ def performCount(rows, groupVar, suchThat, attr, groupByTup, dbStruct, aggrVar, 
                 """
                 if len(nonCondtionCheck) > 0:
                     tup = tuple(nonCondtionCheck)
-                    if (set(tup).issubset(row)):
+
+                    rowStrTup = ()
+                    for ele in row:
+                        rowStrTup = rowStrTup + (str(ele),)
+
+                    valuesToCmp = ()
+                    for idx, rVal in enumerate(rowStrTup):
+                        if idx in condAttrIndex:
+                            valuesToCmp = valuesToCmp + (rVal, )
+
+                    if (set(tup) == set(valuesToCmp)):
                         value[aggrVar] += 1
 
                 else:
@@ -164,8 +171,12 @@ def performMin(rows, groupVar, attr,  aggrVar, suchThat,  groupByTup, dbStruct,m
             nonAttrCondtionList.append(condition)
 
     nonCondtionCheck = []
+    condAttrIndex = []
     for cond in nonAttrCondtionList:
         rowValue = cond.split(" = ")[-1]
+        rr1 = cond.split(" = ")[0]
+        cond_attr = rr1.split('_')[-1]
+        condAttrIndex.append(dbStruct[cond_attr])
         nonCondtionCheck.append(rowValue)
 
     for key, value in mainResult.items():
@@ -185,7 +196,17 @@ def performMin(rows, groupVar, attr,  aggrVar, suchThat,  groupByTup, dbStruct,m
                 """
                 if len(nonCondtionCheck) > 0:
                     tup = tuple(nonCondtionCheck)
-                    if (set(tup).issubset(row)):
+
+                    rowStrTup = ()
+                    for ele in row:
+                        rowStrTup = rowStrTup + (str(ele),)
+
+                    valuesToCmp = ()
+                    for idx, rVal in enumerate(rowStrTup):
+                        if idx in condAttrIndex:
+                            valuesToCmp = valuesToCmp + (rVal, ) 
+
+                    if (set(tup) == set(valuesToCmp)):
                         if(value[aggrVar] > row[dbStruct[attr]]):
                             value[aggrVar] = row[dbStruct[attr]]
                 else:
@@ -209,8 +230,12 @@ def performMax(rows, groupVar, attr,  aggrVar, suchThat,  groupByTup, dbStruct,m
             nonAttrCondtionList.append(condition)
 
     nonCondtionCheck = []
+    condAttrIndex = []
     for cond in nonAttrCondtionList:
         rowValue = cond.split(" = ")[-1]
+        rr1 = cond.split(" = ")[0]
+        cond_attr = rr1.split('_')[-1]
+        condAttrIndex.append(dbStruct[cond_attr])
         nonCondtionCheck.append(rowValue)
 
     for key, value in mainResult.items():
@@ -230,7 +255,17 @@ def performMax(rows, groupVar, attr,  aggrVar, suchThat,  groupByTup, dbStruct,m
                 """
                 if len(nonCondtionCheck) > 0:
                     tup = tuple(nonCondtionCheck)
-                    if (set(tup).issubset(row)):
+
+                    rowStrTup = ()
+                    for ele in row:
+                        rowStrTup = rowStrTup + (str(ele),)
+                    
+                    valuesToCmp = ()
+                    for idx, rVal in enumerate(rowStrTup):
+                        if idx in condAttrIndex:
+                            valuesToCmp = valuesToCmp + (rVal, ) 
+                    
+                    if (set(tup) == set(valuesToCmp)):
                         if(value[aggrVar] < row[dbStruct[attr]]):
                             value[aggrVar] = row[dbStruct[attr]]
                         

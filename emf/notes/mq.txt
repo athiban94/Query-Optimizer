@@ -1,3 +1,10 @@
+ENGLISH
+=======
+"show for each product the total of January, the total of February and
+the total of March sales (in three columns)" - (intragroup
+comparisons, pivoting)
+
+
 EMF
 ===
 select product, sum(X.quantity),
@@ -6,8 +13,6 @@ from Sales
 group by product : X, Y, Z
 such that X.month = 1,
 Y.month = 2
-
-
 
 
 SQL
