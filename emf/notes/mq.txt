@@ -7,12 +7,12 @@ comparisons, pivoting)
 
 EMF
 ===
-select product, sum(X.quantity),
-sum(Y.quantity), sum(Z.quantity)
-from Sales
+select product, sum(X.quantity), sum(Y.quantity), sum(Z.quantity)
+from sales
 group by product : X, Y, Z
 such that X.month = 1,
-Y.month = 2
+            Y.month = 2
+            Z.month  = 3
 
 
 SQL
