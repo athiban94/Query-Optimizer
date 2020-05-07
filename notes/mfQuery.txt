@@ -1,0 +1,27 @@
+
+ENGLISH
+=======
+Find for each customer the average sale in “NY”, 
+the average sale in “CT” and the average sale in “NJ”, 
+if New York’s average is greater than the other two.
+
+
+MF
+================
+select cust, avg(x.quant), avg(y.quant), avg(z.quant)
+from sales
+group by cust; x, y, z
+such that x.state = NY
+             y.state = NJ
+             z.state = CT
+having avg(x.quant) > avg(y.quant) and avg(x.quant) > avg(z.quant)
+
+SQL
+=================
+with 
+t1 as (select cust, avg(quant) as ny from sales where state = 'NY' group by cust ),
+t2 as (select cust, avg(quant) as nj from sales where state = 'NJ' group by cust ),
+t3 as (select cust, avg(quant) as ct from sales where state = 'CT' group by cust )
+select t1.cust, ny, nj, ct
+from t1, t2, t3
+where t1.cust = t2.cust and t2.cust = t3.cust and ny > nj and ny > ct

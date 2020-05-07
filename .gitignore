@@ -16,6 +16,4 @@ __pycache__/
 **/__pycache__/**
 
 emf_out.py
-emf/emf_struct.py
-emf/emf_bot.py
-emf/bot.py
+bot.py
