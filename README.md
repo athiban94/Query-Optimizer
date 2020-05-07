@@ -54,7 +54,7 @@ python3 bot.py
 You should create a .json file in the `./queries` directory by creating the following parameters to the
 `phi` operator as key and value
 
-##EMF
+## EMF
 ```
 select : list of projection attributes
 n      : number of grouping variables
@@ -65,7 +65,7 @@ g      : string containing the having condition
 ```
 
 
-##Example of EMF
+## Example of EMF
 ```
 {
     "select": [
@@ -92,7 +92,7 @@ g      : string containing the having condition
 ```
 
 
-##MF 
+## MF 
 ```
 mf     : mf query
 select : list of projection attributes
@@ -104,7 +104,7 @@ g      : string containing the having condition
 ```
 
 
-##Example of MF
+## Example of MF
 ```
 {
     "mf" : "mf_query",
