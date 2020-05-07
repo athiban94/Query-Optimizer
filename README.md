@@ -39,7 +39,7 @@ pip3 install -r requirements.txt
 In order to run the program, issue the following command:
 
 ```
-python3 auto_emf.py
+python3 auto_emf.py -f <query_file_name.json>
 ```
 
 After running  the above command `bot.py` file will be generated in the same directroy which is resposible for running the query.
@@ -47,6 +47,89 @@ To see the output of the query issue the following command:
 
 ```
 python3 bot.py
+```
+
+## How to create your own queries
+
+You should create a .json file in the `./queries` directory by creating the following parameters to the
+`phi` operator as key and value
+
+##EMF
+```
+select : list of projection attributes
+n      : number of grouping variables
+v      : list of grouping attributes
+f      : list of aggregate functions
+st     : list of such that conditions
+g      : string containing the having condition
+```
+
+
+##Example of EMF
+```
+{
+    "select": [
+        "cust", "prod", "1_max_quant", "2_max_quant", "3_max_quant"
+    ],
+    "n": 3,
+
+    "v": [
+        "prod", "cust"
+    ],
+    "f": [
+        "1_max_quant", "2_max_quant", "3_max_quant"
+    ],
+
+    "st" :[
+       "1_prod = prod", "1_cust = cust", "1_state = NY",
+       "2_prod = prod", "2_cust = cust", "2_state = NJ",
+       "3_prod = prod", "3_cust = cust", "3_state = CT"
+    ],
+
+    "g" : "1_max_quant < 2_max_quant and 1_max_quant < 3_max_quant"
+}
+
+```
+
+
+##MF 
+```
+mf     : mf query
+select : list of projection attributes
+n      : number of grouping variables
+v      : list of grouping attributes
+f      : list of aggregate functions
+st     : list of such that conditions
+g      : string containing the having condition
+```
+
+
+##Example of MF
+```
+{
+    "mf" : "mf_query",
+    "select": [
+        "cust",
+        "1_avg_quant",
+        "2_avg_quant",
+        "3_avg_quant"
+    ],
+    "n": 3,
+    "v": [
+        "cust"
+    ],
+    "f": [
+        "1_avg_quant",
+        "2_avg_quant",
+        "3_avg_quant"
+    ],
+    "st": [
+        "1_state = NY",
+        "2_state = NJ",
+        "3_state = CT"
+    ],
+    "g": "1_avg_quant > 2_avg_quant and 1_avg_quant > 3_avg_quant"
+}
 ```
 
 # Contributions:
