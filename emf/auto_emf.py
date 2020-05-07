@@ -1,6 +1,6 @@
 import json
-file1 = open("emf_bot.py", "w")
-queryFile = 'queries/min_query.json'
+file1 = open("bot.py", "w")
+queryFile = 'queries/pivoting.json'
 
 dataBaseStruct = {
     "cust": 0,
