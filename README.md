@@ -1,7 +1,7 @@
 # Final Project - Query-Optimizer
 
 > Class:  CS-562-A
-> Team:  Synatax Terminators
+> Team:  Syntax Terminators
 
 ## Dependencies
 * Python v3.7.1
