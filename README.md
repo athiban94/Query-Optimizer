@@ -153,3 +153,7 @@ g      : string containing the having condition
 * Generating various queries in English, JSON, MF and EMF form
 * Documenting and bug fixing
 * Creating Presention (PPT)
+
+# Works Cited & Consulted
+
+Dr. Samuel Kim, Computer Science CS562. Stevens Institute of Technology. 7 May 2020.
