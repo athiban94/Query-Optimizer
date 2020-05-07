@@ -5,7 +5,7 @@ the total of March sales (in three columns)" - (intragroup
 comparisons, pivoting)
 
 
-EMF
+MF
 ===
 select product, sum(X.quantity), sum(Y.quantity), sum(Z.quantity)
 from sales

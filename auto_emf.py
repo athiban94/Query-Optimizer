@@ -1,6 +1,14 @@
 import json
+import argparse
+
+parser = argparse.ArgumentParser(description="Parser for MF/EMF queries")
+parser.add_argument('-f', '--file', type=str, help='query file')
+args = parser.parse_args()
+
+qJSONFile = args.file
+
 file1 = open("bot.py", "w")
-queryFile = 'queries/pivoting.json'
+queryFile = 'queries/'+qJSONFile
 
 dataBaseStruct = {
     "cust": 0,
